@@ -1,11 +1,21 @@
 "use client";
 
-import { useCoAgent, useCopilotAction } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction, CopilotKit } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotSidebar } from "@copilotkit/react-ui";
 import { useState } from "react";
 
 export default function CopilotKitPage() {
   const [themeColor, setThemeColor] = useState("#6366f1");
+  const [threadId, setThreadId] = useState<string>(() => {
+    // Generate initial threadId
+    return `thread_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  });
+
+  const handleNewThread = () => {
+    // Generate a new threadId to clear the thread state
+    const newThreadId = `thread_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    setThreadId(newThreadId);
+  };
 
   // 🪁 Frontend Actions: https://docs.copilotkit.ai/guides/frontend-actions
   useCopilotAction({
@@ -21,17 +31,24 @@ export default function CopilotKitPage() {
   });
 
   return (
-    <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
-      <YourMainContent themeColor={themeColor} />
-      <CopilotSidebar
-        clickOutsideToClose={false}
-        defaultOpen={true}
-        labels={{
-          title: "Popup Assistant",
-          initial: "👋 Hi, there! You're chatting with an agent. This agent comes with a few tools to get you started.\n\nFor example you can try:\n- **Frontend Tools**: \"Set the theme to orange\"\n- **Shared State**: \"Write a proverb about AI\"\n- **Generative UI**: \"Get the weather in SF\"\n\nAs you interact with the agent, you'll see the UI update in real-time to reflect the agent's **state**, **tool calls**, and **progress**."
-        }}
-      />
-    </main>
+    <CopilotKit
+      agent="sample_agent"
+      runtimeUrl="/api/copilotkit"
+      showDevConsole={true}
+      threadId={threadId}
+    >
+      <main style={{ "--copilot-kit-primary-color": themeColor } as CopilotKitCSSProperties}>
+        <YourMainContent themeColor={themeColor} threadId={threadId} onNewThread={handleNewThread} />
+        <CopilotSidebar
+          clickOutsideToClose={false}
+          defaultOpen={true}
+          labels={{
+            title: "Popup Assistant",
+            initial: "👋 Hi, there! You're chatting with an agent. This agent comes with a few tools to get you started.\n\nFor example you can try:\n- **Frontend Tools**: \"Set the theme to orange\"\n- **Shared State**: \"Write a proverb about AI\"\n- **Generative UI**: \"Get the weather in SF\"\n\nAs you interact with the agent, you'll see the UI update in real-time to reflect the agent's **state**, **tool calls**, and **progress**.\n\n**Thread Management**: Click the \"New Thread\" button to start a fresh conversation with cleared state."
+          }}
+        />
+      </main>
+    </CopilotKit>
   );
 }
 
@@ -40,7 +57,15 @@ type AgentState = {
   proverbs: string[];
 }
 
-function YourMainContent({ themeColor }: { themeColor: string }) {
+function YourMainContent({
+  themeColor,
+  threadId,
+  onNewThread
+}: {
+  themeColor: string;
+  threadId: string;
+  onNewThread: () => void;
+}) {
   // 🪁 Shared State: https://docs.copilotkit.ai/coagents/shared-state
   const {state, setState} = useCoAgent<AgentState>({
     name: "sample_agent",
@@ -86,8 +111,19 @@ function YourMainContent({ themeColor }: { themeColor: string }) {
       className="h-screen w-screen flex justify-center items-center flex-col transition-colors duration-300"
     >
       <div className="bg-white/20 backdrop-blur-md p-8 rounded-2xl shadow-xl max-w-2xl w-full">
-        <h1 className="text-4xl font-bold text-white mb-2 text-center">Proverbs</h1>
-        <p className="text-gray-200 text-center italic mb-6">This is a demonstrative page, but it could be anything you want! 🪁</p>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Proverbs</h1>
+            <p className="text-gray-200 italic mb-2">This is a demonstrative page, but it could be anything you want! 🪁</p>
+            <p className="text-xs text-white/60 font-mono">Thread: {threadId}</p>
+          </div>
+          <button
+            onClick={onNewThread}
+            className="bg-white/30 hover:bg-white/40 text-white font-semibold px-4 py-2 rounded-lg transition-all"
+          >
+            New Thread
+          </button>
+        </div>
         <hr className="border-white/20 my-6" />
         <div className="flex flex-col gap-3">
           {state.proverbs?.map((proverb, index) => (
