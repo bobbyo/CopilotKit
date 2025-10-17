@@ -20,7 +20,7 @@ export const POST = async (req: NextRequest) => {
 
   const isCrewAi = searchParams.get("coAgentsModel") === "crewai";
 
-  const baseUrl = process.env.REMOTE_ACTION_URL || "http://localhost:8765/copilotkit";
+  const baseUrl = process.env.REMOTE_ACTION_URL || "http://localhost:8000/copilotkit";
 
   // Use remoteEndpoints for FastAPI-based backend with AsyncSqliteSaver
   let runtime = new CopilotRuntime({

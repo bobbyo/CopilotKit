@@ -8,6 +8,7 @@ import {
   useThreads,
   useCreateThread,
 } from "./CopilotKitWithThreads";
+import { ClientIcon } from "./ClientIcon";
 
 export function SimpleThreadManager() {
   const currentThreadId = useCurrentThreadId();
@@ -44,7 +45,9 @@ export function SimpleThreadManager() {
             aria-label={isExpanded ? "Collapse thread list" : "Expand thread list"}
             style={{ color: 'var(--copilot-kit-primary-color)' }}
           >
-            <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+            <ClientIcon>
+              <ChevronRight className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+            </ClientIcon>
           </button>
         )}
 
@@ -73,7 +76,9 @@ export function SimpleThreadManager() {
           }}
           title="Create new thread"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <ClientIcon>
+            <Plus className="w-3.5 h-3.5" />
+          </ClientIcon>
           <span>New</span>
         </button>
       </div>

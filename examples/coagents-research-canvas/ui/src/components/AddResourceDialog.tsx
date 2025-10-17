@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Plus } from "lucide-react";
 import { Resource } from "@/lib/types";
+import { ClientIcon } from "./ClientIcon";
 
 type AddResourceDialogProps = {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export function AddResourceDialog({
           size="sm"
           className="text-sm font-bold text-[#6766FC]"
         >
-          Add Resource <PlusCircle className="w-6 h-6 ml-2" />
+          Add Resource <ClientIcon><PlusCircle className="w-6 h-6 ml-2" /></ClientIcon>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -92,7 +93,7 @@ export function AddResourceDialog({
             !newResource.url || !newResource.title || !newResource.description
           }
         >
-          <Plus className="w-4 h-4 mr-2" /> Add Resource
+          <ClientIcon><Plus className="w-4 h-4 mr-2" /></ClientIcon> Add Resource
         </Button>
       </DialogContent>
     </Dialog>
