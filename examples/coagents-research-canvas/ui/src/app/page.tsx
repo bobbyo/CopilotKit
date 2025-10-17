@@ -1,6 +1,7 @@
 "use client";
 
-import { CopilotKit } from "@copilotkit/react-core";
+import { CopilotKitWithThreads } from "@/components/CopilotKitWithThreads";
+import { SimpleThreadManager } from "@/components/SimpleThreadManager";
 import Main from "./Main";
 import {
   ModelSelectorProvider,
@@ -29,8 +30,11 @@ function Home() {
       }`;
 
   return (
-    <CopilotKit runtimeUrl={runtimeUrl} showDevConsole={false} agent={agent}>
+    <CopilotKitWithThreads runtimeUrl={runtimeUrl} showDevConsole={false} agent={agent}>
+      <div className="fixed top-4 left-4 z-50">
+        <SimpleThreadManager />
+      </div>
       <Main />
-    </CopilotKit>
+    </CopilotKitWithThreads>
   );
 }

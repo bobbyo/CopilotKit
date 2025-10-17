@@ -25,15 +25,6 @@ export function SimpleThreadManager() {
     setIsExpanded(false);
   };
 
-  const handleDeleteThread = (threadId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent thread selection when clicking delete
-    if (threads.length <= 1) {
-      alert("Cannot delete the last thread");
-      return;
-    }
-    deleteThread(threadId);
-  };
-
   const currentThread = threads.find(t => t.id === currentThreadId);
   // Sort other threads by creation date (newest first)
   const otherThreads = threads
