@@ -11,7 +11,7 @@ const serviceAdapter = new OpenAIAdapter({ openai });
 const runtime = new CopilotRuntime({
   remoteActions: [
     {
-      url: "http://localhost:8000/copilotkit",
+      url: "http://localhost:8765/copilotkit",
     },
   ],
 });

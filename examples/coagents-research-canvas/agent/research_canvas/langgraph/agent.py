@@ -30,17 +30,6 @@ workflow.add_edge("delete_node", "perform_delete_node")
 workflow.add_edge("perform_delete_node", "chat_node")
 workflow.add_edge("search_node", "download")
 
-# Conditionally use a checkpointer based on the environment
-# This allows compatibility with both LangGraph API and CopilotKit
+# Export workflow so demo.py can compile it with AsyncSqliteSaver
+# This enables persistent checkpointing for thread switching
 compile_kwargs = {"interrupt_after": ["delete_node"]}
-
-# Check if we're running in LangGraph API mode
-if os.environ.get("LANGGRAPH_API", "false").lower() == "true":
-    # When running in LangGraph API, don't use a custom checkpointer
-    graph = workflow.compile(**compile_kwargs)
-else:
-    # For CopilotKit and other contexts, use MemorySaver
-    from langgraph.checkpoint.memory import MemorySaver
-    memory = MemorySaver()
-    compile_kwargs["checkpointer"] = memory
-    graph = workflow.compile(**compile_kwargs)

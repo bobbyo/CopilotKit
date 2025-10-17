@@ -8,7 +8,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en">
       <body>
         {/* Make sure to use the URL you configured in the previous step  */}
-        <CopilotKit runtimeUrl="/api/copilotkit" agent="quickstart_agent">
+        <CopilotKit runtimeUrl="/api/copilotkit">
           {children}
         </CopilotKit>
       </body>

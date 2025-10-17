@@ -53,7 +53,7 @@ export function useLangGraphInterrupt<TEventValue = any>(
       return;
     }
 
-    setLangGraphInterruptAction(threadId, { ...action, id: actionId });
+    setLangGraphInterruptAction( { ...action, id: actionId });
   }, [
     action,
     hasAction,

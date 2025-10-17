@@ -6,7 +6,6 @@ from langchain_core.runnables import RunnableConfig
 # NOTE: you must use langchain-core >= 0.3 with Pydantic v2
 from pydantic import BaseModel
 
-from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 from copilotkit import CopilotKitState
@@ -94,8 +93,5 @@ graph_builder.add_conditional_edges(
 graph_builder.add_edge("tools", "chatbot")
 graph_builder.add_edge("human", "chatbot")
 graph_builder.set_entry_point("chatbot")
-memory = MemorySaver()
-graph = graph_builder.compile(
-    checkpointer=memory,
-    interrupt_before=["human"],
-)
+
+# Export graph_builder so demo.py can compile it with AsyncSqliteSaver

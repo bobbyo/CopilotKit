@@ -27,7 +27,7 @@ export function useLangGraphInterruptRender(): string | React.ReactElement | nul
       responseRef.current = response;
       // Use setTimeout to defer the state update to next tick
       setTimeout(() => {
-        setLangGraphInterruptAction(threadId, { event: { response } });
+        setLangGraphInterruptAction( { event: { response } });
       }, 0);
     },
     [setLangGraphInterruptAction, threadId],

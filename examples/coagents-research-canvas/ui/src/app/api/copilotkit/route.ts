@@ -20,27 +20,16 @@ export const POST = async (req: NextRequest) => {
 
   const isCrewAi = searchParams.get("coAgentsModel") === "crewai";
 
-  const baseUrl = process.env.REMOTE_ACTION_URL || "http://localhost:8000/copilotkit";
-  let runtime = new CopilotRuntime({
-    agents: {
-      'research_agent': new LangGraphHttpAgent({
-        url: `${baseUrl}/agents/research_agent`,
-      }),
-      'research_agent_google_genai': new LangGraphHttpAgent({
-        url: `${baseUrl}/agents/research_agent_google_genai`,
-      })
-    }
-  })
+  const baseUrl = process.env.REMOTE_ACTION_URL || "http://localhost:8765/copilotkit";
 
-  if (isCrewAi) {
-    runtime = new CopilotRuntime({
-      remoteEndpoints: [
-        copilotKitEndpoint({
-          url: process.env.REMOTE_ACTION_URL || "http://localhost:8000/copilotkit",
-        })
-      ]
-    })
-  }
+  // Use remoteEndpoints for FastAPI-based backend with AsyncSqliteSaver
+  let runtime = new CopilotRuntime({
+    remoteEndpoints: [
+      copilotKitEndpoint({
+        url: baseUrl,
+      })
+    ]
+  })
 
   if (deploymentUrl && !isCrewAi) {
     runtime = new CopilotRuntime({

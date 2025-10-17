@@ -1,6 +1,7 @@
 """Demo"""
 
 import os
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -8,77 +9,33 @@ load_dotenv()
 from fastapi import FastAPI
 import uvicorn
 from copilotkit.integrations.fastapi import add_fastapi_endpoint
-from copilotkit import CopilotKitRemoteEndpoint, LangGraphAGUIAgent
-from copilotkit.crewai import CrewAIAgent
-from research_canvas.crewai.agent import ResearchCanvasFlow
-from research_canvas.langgraph.agent import graph
-from ag_ui_langgraph import add_langgraph_fastapi_endpoint
+from copilotkit import CopilotKitSDK, LangGraphAgent
+from research_canvas.langgraph.agent import workflow, compile_kwargs
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-# from contextlib import asynccontextmanager
-# from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-# @asynccontextmanager
-# async def lifespan(fastapi_app: FastAPI):
-#     """Lifespan for the FastAPI app."""
-#     async with AsyncSqliteSaver.from_conn_string(
-#         ":memory:"
-#     ) as checkpointer:
-#         # Create an async graph
-#         graph = workflow.compile(checkpointer=checkpointer)
+@asynccontextmanager
+async def lifespan(fastapi_app: FastAPI):
+    """Lifespan for the FastAPI app with AsyncSqliteSaver for thread persistence."""
+    async with AsyncSqliteSaver.from_conn_string("checkpoints.db") as checkpointer:
+        # Compile graph with persistent checkpointer
+        graph = workflow.compile(checkpointer=checkpointer, **compile_kwargs)
 
-#         # Create SDK with the graph
-#         sdk = CopilotKitRemoteEndpoint(
-#             agents=[
-#                 LangGraphAgent(
-#                     name="research_agent",
-#                     description="Research agent.",
-#                     graph=graph,
-#                 ),
-#                 LangGraphAgent(
-#                     name="research_agent_google_genai",
-#                     description="Research agent.",
-#                     graph=graph
-#                 ),
-#             ],
-#         )
+        # Create SDK with the compiled graph
+        sdk = CopilotKitSDK(
+            agents=[
+                LangGraphAgent(
+                    name="research_agent",
+                    description="Research agent.",
+                    graph=graph,
+                ),
+            ],
+        )
 
-#         # Add the CopilotKit FastAPI endpoint
-#         add_fastapi_endpoint(fastapi_app, sdk, "/copilotkit")
-#         yield
+        # Add the CopilotKit FastAPI endpoint
+        add_fastapi_endpoint(fastapi_app, sdk, "/copilotkit")
+        yield
 
-# app = FastAPI(lifespan=lifespan)
-
-
-app = FastAPI()
-sdk = CopilotKitRemoteEndpoint(
-    agents=[
-        CrewAIAgent(
-            name="research_agent_crewai",
-            description="Research agent.",
-            flow=ResearchCanvasFlow(),
-        ),
-    ],
-)
-
-add_langgraph_fastapi_endpoint(
-    app=app,
-    agent=LangGraphAGUIAgent(
-        name="research_agent",
-        description="Research agent.",
-        graph=graph
-    ),
-    path="/copilotkit/agents/research_agent"
-)
-add_langgraph_fastapi_endpoint(
-    app=app,
-    agent=LangGraphAGUIAgent(
-        name="research_agent_google_genai",
-        description="Research agent.",
-        graph=graph
-    ),
-    path="/copilotkit/agents/research_agent_google_genai"
-)
-
-add_fastapi_endpoint(app, sdk, "/copilotkit")
+app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/health")
